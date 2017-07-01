@@ -1,0 +1,19 @@
+﻿<Window x:Class="RysowanieKsztaltow.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RysowanieKsztaltow"
+        mc:Ignorable="d"
+        Title="MainWindow" Width="664.359">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Border x:Name="Ramka" BorderBrush="Black" BorderThickness="1" Margin="10,10,0,10.2" Opacity="0.4">
+            <Image x:Name="Screen" Margin="0" MouseDown="Screen_MouseDown" MouseMove="Screen_MouseMove" MouseLeave="Screen_MouseLeave" SizeChanged="Screen_SizeChanged" OpacityMask="Black"/>
+        </Border>
+    </Grid>
+</Window>
