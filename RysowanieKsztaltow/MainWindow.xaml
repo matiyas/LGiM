@@ -12,8 +12,19 @@
             <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
-        <Border x:Name="Ramka" BorderBrush="Black" BorderThickness="1" Margin="10,10,0,10.2" Opacity="0.4">
-            <Image x:Name="Screen" Margin="0" MouseDown="Screen_MouseDown" MouseMove="Screen_MouseMove" MouseLeave="Screen_MouseLeave" SizeChanged="Screen_SizeChanged" OpacityMask="Black"/>
+        <Border x:Name="Ramka" BorderBrush="Black" BorderThickness="1" Margin="10,10,164.6,10.2" Opacity="0.4" Grid.ColumnSpan="2">
+            <Image x:Name="Screen" Margin="0.2,0.2,0.4,-0.4" MouseDown="Screen_MouseDown" MouseMove="Screen_MouseMove" 
+                   SizeChanged="Screen_SizeChanged" OpacityMask="Black"/>
         </Border>
+        <ToggleButton x:Name="BtnDrawLine" Grid.Column="1" HorizontalAlignment="Left" Margin="10.2,10,0,0" VerticalAlignment="Top" Width="35" 
+                      Height="35" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+            <Image Source="C:\Users\damian\Documents\Visual Studio 2017\Projects\LGiM\RysowanieKsztaltow\bin\Debug\icons\line.png" 
+                   Margin="0,0,-0.2,-0.4" d:IsLocked="True"/>
+        </ToggleButton>
+        <Button x:Name="BtnDrawCircle" Grid.Column="1" HorizontalAlignment="Left" Margin="50.2,10,0,0" VerticalAlignment="Top" Width="35" 
+                Height="35" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" >
+            <Image Source="C:\Users\damian\Documents\Visual Studio 2017\Projects\LGiM\RysowanieKsztaltow\bin\Debug\icons\circle.png" 
+                   d:IsLocked="True"/>
+        </Button>
     </Grid>
 </Window>

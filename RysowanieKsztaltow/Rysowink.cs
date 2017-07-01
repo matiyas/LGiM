@@ -82,10 +82,7 @@ namespace RysowanieKsztaltow
 
         public void RysujKolo(int x0, int y0, int x1, int y1)
         {
-            int r;
-
-            if (x0 > x1) r = x0 - x1;
-            else r = x1 - x0;
+            int r = (int)Math.Abs(Math.Sqrt(Math.Pow(x1 - x0, 2) + Math.Pow(y1 - y0, 2)));
 
             for (int x = 0; x <= r; ++x)
             {

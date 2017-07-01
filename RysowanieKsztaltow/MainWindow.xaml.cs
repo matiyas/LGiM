@@ -32,7 +32,7 @@ namespace RysowanieKsztaltow
             InitializeComponent();
 
             dpi = 96;
-            skala = 0.8;
+            skala = 1;
             Loaded += delegate { ResetScreen(); };
         }
 
@@ -55,22 +55,10 @@ namespace RysowanieKsztaltow
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 rysownik.CzyscEkran();
-                //rysownik.RysujLinie((int)(p.X * skala), (int)(p.Y * skala), (int)(e.GetPosition(Screen).X * skala), (int)(e.GetPosition(Screen).Y * skala));
-                rysownik.RysujKolo((int)(p.X * skala), (int)(p.Y * skala), (int)(e.GetPosition(Screen).X * skala), (int)(e.GetPosition(Screen).Y * skala));
-                Screen.Source = BitmapSource.Create(pixsW, pixsH, dpi, dpi, PixelFormats.Bgra32, bmp, pixs, 4 * pixsW);
+                //rysownik.RysujLinie((int)p.X, (int)p.Y, (int)e.GetPosition(Screen).X, (int)e.GetPosition(Screen).Y);
+                rysownik.RysujKolo((int)p.X, (int)p.Y, (int)e.GetPosition(Screen).X, (int)e.GetPosition(Screen).Y);
+                Screen.Source = BitmapSource.Create(pixsW, pixsH, dpi, dpi, PixelFormats.Bgra32, null, pixs, 4 * pixsW);
             }
-        }
-
-        private void Screen_MouseLeave(object sender, MouseEventArgs e)
-        {
-            //var img = d.Image.FromFile("spectrum.bmp");
-            //using (var ms = new MemoryStream())
-            //{
-            //    img.Save(ms, d.Imaging.ImageFormat.Bmp);
-            //    byte[] pixs = ms.ToArray();
-            //    Screen.Source = BitmapSource.Create(img.Width, img.Height, dpi, dpi, PixelFormats.Bgr32, null, pixs, img.Width * 4);
-
-            //}
         }
 
         private void Screen_SizeChanged(object sender, SizeChangedEventArgs e)
