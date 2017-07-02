@@ -5,26 +5,36 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RysowanieKsztaltow"
         mc:Ignorable="d"
-        Title="MainWindow" Width="664.359">
+        Title="MainWindow" Width="749.96">
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="55*"/>
+            <ColumnDefinition Width="666*"/>
         </Grid.ColumnDefinitions>
-        <Border x:Name="Ramka" BorderBrush="Black" BorderThickness="1" Margin="10,10,164.6,10.2" Opacity="0.4" Grid.ColumnSpan="2">
-            <Image x:Name="Screen" Margin="0.2,0.2,0.4,-0.4" MouseDown="Screen_MouseDown" MouseMove="Screen_MouseMove" 
-                   SizeChanged="Screen_SizeChanged" OpacityMask="Black"/>
+        <Border x:Name="Ramka" BorderBrush="#FFB7B7B7" BorderThickness="1" Margin="10.2,10,10.2,10.2" Grid.Column="1">
+            <Image x:Name="Screen" Margin="0.2,0.2,0.4,-0.4" MouseLeftButtonDown="Screen_MouseLeftButtonDown" 
+                   MouseMove="Screen_MouseMove" MouseLeftButtonUp="Screen_MouseLeftButtonUp" SizeChanged="Screen_SizeChanged" 
+                   d:IsLocked="True"/>
         </Border>
-        <ToggleButton x:Name="BtnDrawLine" Grid.Column="1" HorizontalAlignment="Left" Margin="10.2,10,0,0" VerticalAlignment="Top" Width="35" 
-                      Height="35" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+        <ToggleButton x:Name="BtnDrawLine" Margin="10,10,0,0" VerticalAlignment="Top" Height="35" HorizontalContentAlignment="Stretch" 
+                      VerticalContentAlignment="Stretch" Click="BtnDrawLine_Click" 
+                      HorizontalAlignment="Left" Width="35">
             <Image Source="C:\Users\damian\Documents\Visual Studio 2017\Projects\LGiM\RysowanieKsztaltow\bin\Debug\icons\line.png" 
                    Margin="0,0,-0.2,-0.4" d:IsLocked="True"/>
         </ToggleButton>
-        <Button x:Name="BtnDrawCircle" Grid.Column="1" HorizontalAlignment="Left" Margin="50.2,10,0,0" VerticalAlignment="Top" Width="35" 
-                Height="35" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" >
+        <ToggleButton x:Name="BtnDrawCircle" Margin="10,50,0,0" VerticalAlignment="Top" Height="35" HorizontalContentAlignment="Stretch" 
+                VerticalContentAlignment="Stretch" Click="BtnDrawCircle_Click" HorizontalAlignment="Left" Width="35" >
             <Image Source="C:\Users\damian\Documents\Visual Studio 2017\Projects\LGiM\RysowanieKsztaltow\bin\Debug\icons\circle.png" 
                    d:IsLocked="True"/>
+        </ToggleButton>
+        <ToggleButton x:Name="BtnRubber" HorizontalAlignment="Left" Margin="10,90,0,0" VerticalAlignment="Top" Width="35" Height="35"
+                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Click="BtnRubber_Click">
+            <Image Source="C:\Users\damian\Documents\Visual Studio 2017\Projects\LGiM\RysowanieKsztaltow\bin\Debug\icons\rubber.png" />
+        </ToggleButton>
+        <Button x:Name="BtnClear" Grid.ColumnSpan="2" HorizontalAlignment="Left" Margin="10,130,0,0" VerticalAlignment="Top" 
+                Width="35" Height="35" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Click="BtnClear_Click">
+            <Image Source="C:\Users\damian\Documents\Visual Studio 2017\Projects\LGiM\RysowanieKsztaltow\bin\Debug\icons\clear.png"/>
         </Button>
     </Grid>
 </Window>

@@ -1,17 +1,20 @@
 ﻿using System;
+using System.Windows.Media;
 
 namespace RysowanieKsztaltow
 {
     class Rysownik
     {
-        private byte kolorR, kolorG, kolorB, alpha;
         private byte[] pixs;
         private int wysokosc, szerokosc;
+        public Color KolorPedzla;
 
         public Rysownik(ref byte[] pixs, int szerokosc, int wysokosc)
         {
-            kolorR = kolorG = kolorB = 0;
-            alpha = 255;
+            //KolorPedzla = new Color();
+            KolorPedzla.R = KolorPedzla.G = KolorPedzla.B = 0;
+            KolorPedzla.A = 255;
+
             this.pixs = pixs;
             this.szerokosc = szerokosc;
             this.wysokosc = wysokosc;
@@ -19,10 +22,10 @@ namespace RysowanieKsztaltow
 
         public void UstawPedzel(byte r, byte g, byte b, byte a)
         {
-            kolorR = r;
-            kolorG = g;
-            kolorB = b;
-            alpha = a;
+            KolorPedzla.R = r;
+            KolorPedzla.G = g;
+            KolorPedzla.B = b;
+            KolorPedzla.A = a;
         }
 
         public void RysujPiksel(int x, int y)
@@ -30,10 +33,22 @@ namespace RysowanieKsztaltow
             if (x >= 0 && x < szerokosc && y >= 0 && y < wysokosc)
             {
                 int pozycja = 4 * (y * szerokosc + x);
-                pixs[pozycja] = kolorB;
-                pixs[pozycja + 1] = kolorG;
-                pixs[pozycja + 2] = kolorR;
-                pixs[pozycja + 3] = alpha;
+                pixs[pozycja] = KolorPedzla.B;
+                pixs[pozycja + 1] = KolorPedzla.G;
+                pixs[pozycja + 2] = KolorPedzla.R;
+                pixs[pozycja + 3] = KolorPedzla.A;
+            }
+        }
+
+        public void RysujPiksel(int x, int y, byte r, byte g, byte b, byte a)
+        {
+            if (x >= 0 && x < szerokosc && y >= 0 && y < wysokosc)
+            {
+                int pozycja = 4 * (y * szerokosc + x);
+                pixs[pozycja] = b;
+                pixs[pozycja + 1] = g;
+                pixs[pozycja + 2] = r;
+                pixs[pozycja + 3] = a;
             }
         }
 
@@ -103,6 +118,37 @@ namespace RysowanieKsztaltow
                 // Lewy dół
                 RysujPiksel(-y + x0, x + y0);
                 RysujPiksel(-x + x0, y + y0);
+            }
+        }
+
+        public void Gumka(int x, int y)
+        {
+            for(int i = y - 2; i < y + 2; ++i)
+            {
+                for(int j = x - 2; j < x + 2; ++j)
+                {
+                    RysujPiksel(j, i, 255, 255, 255, 255);
+                }
+            }
+        }
+
+        public static Color SprawdzKolor(int x, int y, byte[] pixs, int szerokosc, int wysokosc)
+        {
+            if (x >= 0 && x < szerokosc && y >= 0 && y < wysokosc)
+            {
+                Color kolor = new Color();
+
+                int pozycja = 4 * (y * szerokosc + x);
+                kolor.B = pixs[pozycja];
+                kolor.G = pixs[pozycja + 1];
+                kolor.R = pixs[pozycja + 2];
+                kolor.A = pixs[pozycja + 3];
+
+                return kolor;
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException("Pozycja z poza zakresu tablicy");
             }
         }
     }

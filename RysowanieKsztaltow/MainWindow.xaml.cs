@@ -20,50 +20,118 @@ namespace RysowanieKsztaltow
 {
     public partial class MainWindow : Window
     {
-        private byte[] pixs;
+        private byte[] pixs, tmpPixs;
         private int pixsW, pixsH;
         private Rysownik rysownik;
-        private Point p;
+        private Point p0;
         private double dpi;
-        private double skala;
+        private Point kursorPos;
+        private Action<int, int, int, int> akcja;
 
         public MainWindow()
         {
             InitializeComponent();
 
             dpi = 96;
-            skala = 1;
-            Loaded += delegate { ResetScreen(); };
+            Loaded += delegate { ResetScreen(); };            
         }
 
         private void ResetScreen()
         {
-            pixsW = (int)(Ramka.ActualWidth * skala);
-            pixsH = (int)(Ramka.ActualHeight * skala);
+            pixsW = (int)Ramka.ActualWidth;
+            pixsH = (int)Ramka.ActualHeight;
+            tmpPixs = new byte[4 * pixsW * pixsH];
             pixs = new byte[4 * pixsW * pixsH];
-            rysownik = new Rysownik(ref pixs, pixsW, pixsH);
-            Screen.Source = BitmapSource.Create(pixsW, pixsH, dpi, dpi, PixelFormats.Bgra32, null, pixs, 4 * pixsW);
+            rysownik = new Rysownik(ref tmpPixs, pixsW, pixsH);
+            Screen.Source = BitmapSource.Create(pixsW, pixsH, dpi, dpi, PixelFormats.Bgra32, null, tmpPixs, 4 * pixsW);
         }
 
-        private void Screen_MouseDown(object sender, MouseButtonEventArgs e)
+        private void Screen_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            p = new Point(e.GetPosition(Screen).X, e.GetPosition(Screen).Y);
+            p0 = new Point(e.GetPosition(Screen).X, e.GetPosition(Screen).Y);
+        }
+
+        private void Screen_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            Array.Copy(tmpPixs, pixs, tmpPixs.Length);
         }
 
         private void Screen_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                rysownik.CzyscEkran();
-                //rysownik.RysujLinie((int)p.X, (int)p.Y, (int)e.GetPosition(Screen).X, (int)e.GetPosition(Screen).Y);
-                rysownik.RysujKolo((int)p.X, (int)p.Y, (int)e.GetPosition(Screen).X, (int)e.GetPosition(Screen).Y);
-                Screen.Source = BitmapSource.Create(pixsW, pixsH, dpi, dpi, PixelFormats.Bgra32, null, pixs, 4 * pixsW);
+                kursorPos = e.GetPosition(Screen);
+
+                if (akcja != null)
+                {
+                    akcja((int)p0.X, (int)p0.Y, (int)e.GetPosition(Screen).X, (int)e.GetPosition(Screen).Y);
+                    Screen.Source = BitmapSource.Create(pixsW, pixsH, dpi, dpi, PixelFormats.Bgra32, null, tmpPixs, 4 * pixsW);
+                }
             }
         }
 
+        private void BtnDrawLine_Click(object sender, RoutedEventArgs e)
+        {
+            BtnDrawCircle.IsChecked = false;
+            BtnRubber.IsChecked = false;
+
+            akcja = (x0, y0, x1, y1) => 
+            {
+                Array.Copy(pixs, tmpPixs, pixs.Length);
+                rysownik.RysujLinie(x0, y0, x1, y1);
+            };
+        }
+
+        private void BtnDrawCircle_Click(object sender, RoutedEventArgs e)
+        {
+            BtnDrawLine.IsChecked = false;
+            BtnRubber.IsChecked = false;
+
+            akcja = (x0, y0, x1, y1) =>
+            {
+                Array.Copy(pixs, tmpPixs, pixs.Length);
+                rysownik.RysujKolo(x0, y0, x1, y1);
+            };
+        }
+
+        private void BtnRubber_Click(object sender, RoutedEventArgs e)
+        {
+            BtnDrawLine.IsChecked = false;
+            BtnDrawCircle.IsChecked = false;
+
+            akcja = (x0, y0, x1, y1) => { rysownik.Gumka(x1, y1); };
+        }
+        
+        private void BtnClear_Click(object sender, RoutedEventArgs e)
+        {
+            rysownik.CzyscEkran();
+            Array.Copy(tmpPixs, pixs, tmpPixs.Length);
+            Screen.Source = BitmapSource.Create(pixsW, pixsH, dpi, dpi, PixelFormats.Bgra32, null, tmpPixs, 4 * pixsW);
+        }
+        
         private void Screen_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            ResetScreen();
+            int oldW = pixsW;
+            int oldH = pixsH;
+
+            pixsW = (int)Ramka.ActualWidth;
+            pixsH = (int)Ramka.ActualHeight;
+            tmpPixs = new byte[4 * pixsW * pixsH];
+            rysownik = new Rysownik(ref tmpPixs, pixsW, pixsH);
+
+            for (int i = 0; i < oldH; ++i)
+            {
+                for(int j = 0; j < oldW; ++j)
+                {
+                    var kolor = Rysownik.SprawdzKolor(j, i, pixs, oldW, oldH);
+                    rysownik.RysujPiksel(j, i, kolor.R, kolor.G, kolor.B, kolor.A);
+                }
+            }
+
+            pixs = new byte[4 * pixsW * pixsH];
+            Array.Copy(tmpPixs, pixs, tmpPixs.Length);
+            
+            Screen.Source = BitmapSource.Create(pixsW, pixsH, dpi, dpi, PixelFormats.Bgra32, null, tmpPixs, 4 * pixsW);
         }
     }
 }
