@@ -121,6 +121,38 @@ namespace RysowanieKsztaltow
             }
         }
 
+        public void RysujElipse(int x0, int y0, int x1, int y1, int beta)
+        {
+            double x = 0;
+            double y = 0;
+
+            // Promienie elipsy
+            int r1 = x1 - x0;
+            int r2 = y1 - y0;
+
+            for (int i = 0; i <= 360; ++i)
+            {
+                // Kąt obrotu kolejnych punktów w radianach
+                double alfa = (i / 360.0) * (2 * Math.PI);
+
+                // Zapomiętanie położenia poprzednich punktów
+                double oldX = x;
+                double oldY = y;
+
+                // Obrót punktów
+                x = r1 * Math.Cos(alfa);
+                y = r2 * Math.Sin(alfa);
+
+                // Obrót elipsy
+                double tmp = x;
+                x = x * Math.Cos(beta) - y * Math.Sin(beta);
+                y = tmp * Math.Sin(beta) + y * Math.Cos(beta);
+
+                if (i > 0)
+                    RysujLinie((int)oldX + x0, (int)oldY + y0, (int)x + x0, (int)y + y0);
+            }
+        }
+
         public void Gumka(int x, int y)
         {
             for(int i = y - 2; i < y + 2; ++i)

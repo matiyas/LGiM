@@ -21,29 +21,25 @@ namespace RysowanieKsztaltow
     public partial class MainWindow : Window
     {
         private byte[] pixs, tmpPixs;
-        private int pixsW, pixsH;
         private Rysownik rysownik;
         private Point p0;
+        private Point p1;
         private double dpi;
-        private Point kursorPos;
         private Action<int, int, int, int> akcja;
+        private Size canvasSize;
 
         public MainWindow()
         {
             InitializeComponent();
 
             dpi = 96;
-            Loaded += delegate { ResetScreen(); };            
-        }
-
-        private void ResetScreen()
-        {
-            pixsW = (int)Ramka.ActualWidth;
-            pixsH = (int)Ramka.ActualHeight;
-            tmpPixs = new byte[4 * pixsW * pixsH];
-            pixs = new byte[4 * pixsW * pixsH];
-            rysownik = new Rysownik(ref tmpPixs, pixsW, pixsH);
-            Screen.Source = BitmapSource.Create(pixsW, pixsH, dpi, dpi, PixelFormats.Bgra32, null, tmpPixs, 4 * pixsW);
+            canvasSize.Width = 1366;
+            canvasSize.Height = 768;
+            tmpPixs = new byte[4 * (int)canvasSize.Width * (int)canvasSize.Height];
+            pixs = new byte[4 * (int)canvasSize.Width * (int)canvasSize.Height];
+            rysownik = new Rysownik(ref tmpPixs, (int)canvasSize.Width, (int)canvasSize.Height);
+            Screen.Source = BitmapSource.Create((int)canvasSize.Width, (int)canvasSize.Height, dpi, dpi, PixelFormats.Bgra32, null, tmpPixs,
+                4 * (int)canvasSize.Width);       
         }
 
         private void Screen_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -58,15 +54,17 @@ namespace RysowanieKsztaltow
 
         private void Screen_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                kursorPos = e.GetPosition(Screen);
+            p1 = e.GetPosition(Screen);
 
-                if (akcja != null)
-                {
-                    akcja((int)p0.X, (int)p0.Y, (int)e.GetPosition(Screen).X, (int)e.GetPosition(Screen).Y);
-                    Screen.Source = BitmapSource.Create(pixsW, pixsH, dpi, dpi, PixelFormats.Bgra32, null, tmpPixs, 4 * pixsW);
-                }
+            // Show on window actual mouse position on the screen.
+            MousePos.Content = $"{Convert.ToInt32(p1.X)} x {Convert.ToInt32(p1.Y)}";
+
+            // After pressing left mouse button on the screen, do the right action.
+            if (e.LeftButton == MouseButtonState.Pressed && akcja != null)
+            {
+                akcja((int)p0.X, (int)p0.Y, (int)p1.X, (int)p1.Y);
+                Screen.Source = BitmapSource.Create((int)canvasSize.Width, (int)canvasSize.Height, dpi, dpi, PixelFormats.Bgra32, null,
+                    tmpPixs, 4 * (int)canvasSize.Width);
             }
         }
 
@@ -74,6 +72,7 @@ namespace RysowanieKsztaltow
         {
             BtnDrawCircle.IsChecked = false;
             BtnRubber.IsChecked = false;
+            BtnRysujElipse.IsChecked = false;
 
             akcja = (x0, y0, x1, y1) => 
             {
@@ -86,6 +85,7 @@ namespace RysowanieKsztaltow
         {
             BtnDrawLine.IsChecked = false;
             BtnRubber.IsChecked = false;
+            BtnRysujElipse.IsChecked = false;
 
             akcja = (x0, y0, x1, y1) =>
             {
@@ -98,40 +98,37 @@ namespace RysowanieKsztaltow
         {
             BtnDrawLine.IsChecked = false;
             BtnDrawCircle.IsChecked = false;
+            BtnRysujElipse.IsChecked = false;
 
             akcja = (x0, y0, x1, y1) => { rysownik.Gumka(x1, y1); };
         }
-        
+
+        private void BtnRysujElipse_Click(object sender, RoutedEventArgs e)
+        {
+            BtnDrawLine.IsChecked = false;
+            BtnDrawCircle.IsChecked = false;
+            BtnRubber.IsChecked = false;
+
+            akcja = (x0, y0, x1, y1) =>
+            {
+                Array.Copy(pixs, tmpPixs, pixs.Length);
+                rysownik.RysujElipse(x0, y0, x1, y1, (int)EllipseSlider.Value);
+            };
+        }
+
+        private void EllipseSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            MousePos.Content = EllipseSlider.Value.ToString();
+            //Array.Copy(pixs, tmpPixs, pixs.Length);
+            rysownik.RysujElipse((int)p0.X, (int)p0.Y, (int)p1.X, (int)p1.Y, (int)EllipseSlider.Value);
+        }
+
         private void BtnClear_Click(object sender, RoutedEventArgs e)
         {
             rysownik.CzyscEkran();
             Array.Copy(tmpPixs, pixs, tmpPixs.Length);
-            Screen.Source = BitmapSource.Create(pixsW, pixsH, dpi, dpi, PixelFormats.Bgra32, null, tmpPixs, 4 * pixsW);
-        }
-        
-        private void Screen_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            int oldW = pixsW;
-            int oldH = pixsH;
-
-            pixsW = (int)Ramka.ActualWidth;
-            pixsH = (int)Ramka.ActualHeight;
-            tmpPixs = new byte[4 * pixsW * pixsH];
-            rysownik = new Rysownik(ref tmpPixs, pixsW, pixsH);
-
-            for (int i = 0; i < oldH; ++i)
-            {
-                for(int j = 0; j < oldW; ++j)
-                {
-                    var kolor = Rysownik.SprawdzKolor(j, i, pixs, oldW, oldH);
-                    rysownik.RysujPiksel(j, i, kolor.R, kolor.G, kolor.B, kolor.A);
-                }
-            }
-
-            pixs = new byte[4 * pixsW * pixsH];
-            Array.Copy(tmpPixs, pixs, tmpPixs.Length);
-            
-            Screen.Source = BitmapSource.Create(pixsW, pixsH, dpi, dpi, PixelFormats.Bgra32, null, tmpPixs, 4 * pixsW);
+            Screen.Source = BitmapSource.Create((int)canvasSize.Width, (int)canvasSize.Height, dpi, dpi, PixelFormats.Bgra32, null, tmpPixs, 
+                4 * (int)canvasSize.Width);
         }
     }
 }
