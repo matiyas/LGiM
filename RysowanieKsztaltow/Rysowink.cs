@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Media;
 
 namespace RysowanieKsztaltow
@@ -121,8 +122,10 @@ namespace RysowanieKsztaltow
             }
         }
 
-        public void RysujElipse(int x0, int y0, int x1, int y1, int beta)
+        public void RysujElipse(int x0, int y0, int x1, int y1, double beta)
         {
+            beta *= (2 * Math.PI / 360);
+
             double x = 0;
             double y = 0;
 
@@ -150,6 +153,29 @@ namespace RysowanieKsztaltow
 
                 if (i > 0)
                     RysujLinie((int)oldX + x0, (int)oldY + y0, (int)x + x0, (int)y + y0);
+            }
+        }
+
+        public void RysujKrzywa(Point p0, Point p1, Point p2, Point p3)
+        {
+            Point tmp = p0;
+            double step = 1.0 / 25.0;
+            double t = 0;
+            for (int i = 0; i <= 25; ++i)
+            {
+                double x = (-Math.Pow(t, 3) + 3 * Math.Pow(t, 2) - 3 * t + 1) / 6 * p0.X 
+                         + (3 * Math.Pow(t, 3) - 6 * Math.Pow(t, 2) + 4) / 6 * p1.X 
+                         + (-3 * Math.Pow(t, 3) + 3 * Math.Pow(t, 2) + 3 * t + 1) / 6 * p2.X 
+                         + Math.Pow(t, 3) / 6 * p3.X;
+
+                double y = (-Math.Pow(t, 3) + 3 * Math.Pow(t, 2) - 3 * t + 1) / 6 * p0.Y 
+                         + (3 * Math.Pow(t, 3) - 6 * Math.Pow(t, 2) + 4) / 6 * p1.Y
+                         + (-3 * Math.Pow(t, 3) + 3 * Math.Pow(t, 2) + 3 * t + 1) / 6 * p2.Y
+                         + Math.Pow(t, 3) / 6 * p3.Y;
+
+                if (i > 0) RysujLinie((int)x, (int)y, (int)tmp.X, (int)tmp.Y);
+                tmp = new Point(x, y);
+                t += step;
             }
         }
 

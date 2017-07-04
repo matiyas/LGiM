@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -22,15 +23,25 @@ namespace RysowanieKsztaltow
     {
         private byte[] pixs, tmpPixs;
         private Rysownik rysownik;
-        private Point p0;
-        private Point p1;
         private double dpi;
         private Action<int, int, int, int> akcja;
         private Size canvasSize;
+        private List<Point> kliknietePunkty;
+        private Action<MouseButtonEventArgs> DodajPunkt;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            kliknietePunkty = new List<Point>();
+            DodajPunkt = e =>
+            {
+                if (kliknietePunkty.Count >= 4)
+                {
+                    kliknietePunkty.RemoveAt(0);
+                }
+                kliknietePunkty.Add(e.GetPosition(Screen));
+            };
 
             dpi = 96;
             canvasSize.Width = 1366;
@@ -38,13 +49,21 @@ namespace RysowanieKsztaltow
             tmpPixs = new byte[4 * (int)canvasSize.Width * (int)canvasSize.Height];
             pixs = new byte[4 * (int)canvasSize.Width * (int)canvasSize.Height];
             rysownik = new Rysownik(ref tmpPixs, (int)canvasSize.Width, (int)canvasSize.Height);
-            Screen.Source = BitmapSource.Create((int)canvasSize.Width, (int)canvasSize.Height, dpi, dpi, PixelFormats.Bgra32, null, tmpPixs,
-                4 * (int)canvasSize.Width);       
+            Screen.Source = BitmapSource.Create((int)canvasSize.Width, (int)canvasSize.Height, dpi, dpi, PixelFormats.Bgra32, null, 
+                tmpPixs, 4 * (int)canvasSize.Width);       
         }
 
         private void Screen_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            p0 = new Point(e.GetPosition(Screen).X, e.GetPosition(Screen).Y);
+            DodajPunkt(e);
+            Array.Copy(pixs, tmpPixs, pixs.Length);
+            
+            if (kliknietePunkty.Count == 4 && RadioDrawCurve.IsChecked == true)
+            {
+                rysownik.RysujKrzywa(kliknietePunkty[0], kliknietePunkty[1], kliknietePunkty[2], Mouse.GetPosition(Screen)); 
+            }
+            Screen.Source = BitmapSource.Create((int)canvasSize.Width, (int)canvasSize.Height, dpi, dpi, PixelFormats.Bgra32, null,
+                    tmpPixs, 4 * (int)canvasSize.Width);
         }
 
         private void Screen_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -54,39 +73,32 @@ namespace RysowanieKsztaltow
 
         private void Screen_MouseMove(object sender, MouseEventArgs e)
         {
-            p1 = e.GetPosition(Screen);
-
             // Show on window actual mouse position on the screen.
-            MousePos.Content = $"{Convert.ToInt32(p1.X)} x {Convert.ToInt32(p1.Y)}";
+            MousePos.Content = $"{Convert.ToInt32(e.GetPosition(Screen).X)} x {Convert.ToInt32(e.GetPosition(Screen).Y)}";
 
             // After pressing left mouse button on the screen, do the right action.
             if (e.LeftButton == MouseButtonState.Pressed && akcja != null)
             {
-                akcja((int)p0.X, (int)p0.Y, (int)p1.X, (int)p1.Y);
+                kliknietePunkty[kliknietePunkty.Count - 1] = e.GetPosition(Screen);
+                akcja((int)kliknietePunkty[kliknietePunkty.Count - 2].X, (int)kliknietePunkty[kliknietePunkty.Count - 2].Y,
+                    (int)kliknietePunkty[kliknietePunkty.Count - 1].X, (int)kliknietePunkty[kliknietePunkty.Count - 1].Y);
+
                 Screen.Source = BitmapSource.Create((int)canvasSize.Width, (int)canvasSize.Height, dpi, dpi, PixelFormats.Bgra32, null,
                     tmpPixs, 4 * (int)canvasSize.Width);
             }
         }
 
-        private void BtnDrawLine_Click(object sender, RoutedEventArgs e)
+        private void RadioDrawLine_Click(object sender, RoutedEventArgs e)
         {
-            BtnDrawCircle.IsChecked = false;
-            BtnRubber.IsChecked = false;
-            BtnRysujElipse.IsChecked = false;
-
-            akcja = (x0, y0, x1, y1) => 
+            akcja = (x0, y0, x1, y1) =>
             {
                 Array.Copy(pixs, tmpPixs, pixs.Length);
                 rysownik.RysujLinie(x0, y0, x1, y1);
             };
         }
 
-        private void BtnDrawCircle_Click(object sender, RoutedEventArgs e)
+        private void RadioDrawCircle_Click(object sender, RoutedEventArgs e)
         {
-            BtnDrawLine.IsChecked = false;
-            BtnRubber.IsChecked = false;
-            BtnRysujElipse.IsChecked = false;
-
             akcja = (x0, y0, x1, y1) =>
             {
                 Array.Copy(pixs, tmpPixs, pixs.Length);
@@ -94,41 +106,38 @@ namespace RysowanieKsztaltow
             };
         }
 
-        private void BtnRubber_Click(object sender, RoutedEventArgs e)
+        private void RadioDrawEllipse_Click(object sender, RoutedEventArgs e)
         {
-            BtnDrawLine.IsChecked = false;
-            BtnDrawCircle.IsChecked = false;
-            BtnRysujElipse.IsChecked = false;
-
-            akcja = (x0, y0, x1, y1) => { rysownik.Gumka(x1, y1); };
-        }
-
-        private void BtnRysujElipse_Click(object sender, RoutedEventArgs e)
-        {
-            BtnDrawLine.IsChecked = false;
-            BtnDrawCircle.IsChecked = false;
-            BtnRubber.IsChecked = false;
-
             akcja = (x0, y0, x1, y1) =>
             {
                 Array.Copy(pixs, tmpPixs, pixs.Length);
-                rysownik.RysujElipse(x0, y0, x1, y1, (int)EllipseSlider.Value);
+                rysownik.RysujElipse(x0, y0, x1, y1, 0);
             };
         }
 
-        private void EllipseSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void RadioDrawCurve_Click(object sender, RoutedEventArgs e)
         {
-            MousePos.Content = EllipseSlider.Value.ToString();
-            //Array.Copy(pixs, tmpPixs, pixs.Length);
-            rysownik.RysujElipse((int)p0.X, (int)p0.Y, (int)p1.X, (int)p1.Y, (int)EllipseSlider.Value);
+            akcja = (p0, p1, p2, p3) =>
+            {
+                if (kliknietePunkty.Count == 4)
+                {
+                    Array.Copy(pixs, tmpPixs, pixs.Length);
+                    rysownik.RysujKrzywa(kliknietePunkty[0], kliknietePunkty[1], kliknietePunkty[2], Mouse.GetPosition(Screen));
+                }
+            };
+        }
+
+        private void RadioRubber_Click(object sender, RoutedEventArgs e)
+        {
+            akcja = (x0, y0, x1, y1) => { rysownik.Gumka(x1, y1); };
         }
 
         private void BtnClear_Click(object sender, RoutedEventArgs e)
         {
             rysownik.CzyscEkran();
             Array.Copy(tmpPixs, pixs, tmpPixs.Length);
-            Screen.Source = BitmapSource.Create((int)canvasSize.Width, (int)canvasSize.Height, dpi, dpi, PixelFormats.Bgra32, null, tmpPixs, 
-                4 * (int)canvasSize.Width);
+            Screen.Source = BitmapSource.Create((int)canvasSize.Width, (int)canvasSize.Height, dpi, dpi, PixelFormats.Bgra32, null,
+                tmpPixs, 4 * (int)canvasSize.Width);
         }
     }
 }

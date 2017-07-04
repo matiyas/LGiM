@@ -19,49 +19,56 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <ToolBar Height="40" VerticalAlignment="Top" Margin="10,0" Grid.ColumnSpan="2">
-            <ToggleButton x:Name="BtnDrawLine" Margin="0" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" 
-                      VerticalContentAlignment="Stretch" Click="BtnDrawLine_Click" HorizontalAlignment="Left">
+        <Border BorderBrush="#FFCECECE" BorderThickness="1" Grid.Column="1" Grid.Row="1">
+            <ScrollViewer x:Name="Canvas" HorizontalScrollBarVisibility="Visible" HorizontalContentAlignment="Stretch" 
+                      VerticalContentAlignment="Stretch" BorderBrush="Black" Foreground="Black" Background="AliceBlue" Margin="0" 
+                          d:IsLocked="True" d:IsHidden="True" 
+                      >
+                <Border x:Name="CanvasBorder" BorderBrush="#FFA4A4A4" BorderThickness="0,0,1,1" Height="768" Width="1366" 
+                        HorizontalAlignment="Left" VerticalAlignment="Top" Background="White" ClipToBounds="True" 
+                        ScrollViewer.VerticalScrollBarVisibility="Disabled" d:IsHidden="True">
+                    <Image x:Name="Screen" MouseLeftButtonDown="Screen_MouseLeftButtonDown" MouseMove="Screen_MouseMove" 
+                        MouseLeftButtonUp="Screen_MouseLeftButtonUp" d:IsLocked="True" d:IsHidden="True"/>
+                </Border>
+            </ScrollViewer>
+        </Border>
+
+        <ToolBar x:Name="Przybornik" Height="40" VerticalAlignment="Top" Margin="10,0" Grid.ColumnSpan="2">
+            
+            <RadioButton x:Name="RadioDrawLine" Height="35" VerticalAlignment="Top" Click="RadioDrawLine_Click">
                 <Image Source="C:\Users\damian\Documents\Visual Studio 2017\Projects\LGiM\RysowanieKsztaltow\bin\Debug\icons\line.png" 
-                   Margin="0,0,-0.2,-0.4" d:IsLocked="True"/>
-            </ToggleButton>
-            <ToggleButton x:Name="BtnDrawCircle" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" 
-                VerticalContentAlignment="Stretch" Click="BtnDrawCircle_Click" HorizontalAlignment="Right" >
+                   Margin="0,0,-0.2,0" d:IsLocked="True"/>
+            </RadioButton>
+            
+            <RadioButton x:Name="RadioDrawCircle" Height="35" VerticalAlignment="Top" Click="RadioDrawCircle_Click">
                 <Image Source="C:\Users\damian\Documents\Visual Studio 2017\Projects\LGiM\RysowanieKsztaltow\bin\Debug\icons\circle.png" 
-                   d:IsLocked="True"/>
-            </ToggleButton>
-            <ToggleButton x:Name="BtnRysujElipse" HorizontalAlignment="Left" VerticalAlignment="Top"
-                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Click="BtnRysujElipse_Click">
+                       d:IsLocked="True"/>
+            </RadioButton>
+            
+            <RadioButton x:Name="RadioDrawEllipse" Height="35" VerticalAlignment="Top" Click="RadioDrawEllipse_Click">
                 <Image Source="C:\Users\damian\Documents\Visual Studio 2017\Projects\LGiM\RysowanieKsztaltow\bin\Debug\icons\ellipse.png" 
-                   d:IsLocked="True"/>
-            </ToggleButton>
-            <ToggleButton x:Name="BtnRubber" HorizontalAlignment="Right" VerticalAlignment="Top"
-                HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Click="BtnRubber_Click">
+                       d:IsLocked="True"/>
+            </RadioButton>
+            
+            <RadioButton x:Name="RadioDrawCurve" Height="35" VerticalAlignment="Top" Click="RadioDrawCurve_Click">
+                <Image Source="C:\Users\damian\Documents\Visual Studio 2017\Projects\LGiM\RysowanieKsztaltow\bin\Debug\icons\bezier.png" 
+                       Height="29" Width="29" d:IsLocked="True"/>
+            </RadioButton>
+            
+            <RadioButton x:Name="RadioRubber" Height="35" VerticalAlignment="Top" Click="RadioRubber_Click">
                 <Image Source="C:\Users\damian\Documents\Visual Studio 2017\Projects\LGiM\RysowanieKsztaltow\bin\Debug\icons\rubber.png" 
-                   d:IsLocked="True" />
-            </ToggleButton>
+                       OpacityMask="Black" d:IsLocked="True" />
+            </RadioButton>
+            
             <Button x:Name="BtnClear" HorizontalAlignment="Left" VerticalAlignment="Top" HorizontalContentAlignment="Stretch" 
-                    VerticalContentAlignment="Stretch" Click="BtnClear_Click">
+                    VerticalContentAlignment="Stretch" Click="BtnClear_Click" Margin="0,0,0,-5">
                 <Image Source="C:\Users\damian\Documents\Visual Studio 2017\Projects\LGiM\RysowanieKsztaltow\bin\Debug\icons\clear.png" 
                    d:IsLocked="True"/>
             </Button>
+            
         </ToolBar>
 
-        <ScrollViewer x:Name="Canvas" HorizontalScrollBarVisibility="Visible" HorizontalContentAlignment="Stretch" 
-                      VerticalContentAlignment="Stretch" BorderBrush="Black" Foreground="Black" Background="AliceBlue" Margin="0,0,12,2" 
-                      Grid.Column="1" Grid.Row="1">
-            <Border x:Name="CanvasBorder" BorderBrush="#FFA4A4A4" BorderThickness="1" Height="768" Width="1366" HorizontalAlignment="Left" 
-                    VerticalAlignment="Top" Background="White" ClipToBounds="True" ScrollViewer.VerticalScrollBarVisibility="Disabled" 
-                    d:IsLocked="True">
-                <Image x:Name="Screen" MouseLeftButtonDown="Screen_MouseLeftButtonDown" MouseMove="Screen_MouseMove" 
-                        MouseLeftButtonUp="Screen_MouseLeftButtonUp" d:IsLocked="True" d:IsHidden="True"/>
-            </Border>
-        </ScrollViewer>
-        
         <Label x:Name="MousePos" Content="0 x 0" Grid.Column="1" Grid.Row="2" HorizontalContentAlignment="Center" 
                VerticalContentAlignment="Stretch" HorizontalAlignment="Right" Width="105"/>
-        
-        <Slider x:Name="EllipseSlider" Margin="42,10,0,0" Grid.Row="1" VerticalAlignment="Top" Orientation="Vertical" Height="172" 
-                HorizontalAlignment="Left" Maximum="1" Minimum="-1" ValueChanged="EllipseSlider_ValueChanged"/>
     </Grid>
 </Window>
